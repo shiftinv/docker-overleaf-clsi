@@ -48,7 +48,7 @@ ENV SHARELATEX_CONFIG /app/config/settings.clsi.coffee
 
 # Install TeX Live
 RUN apt-get update \
-  && apt-get install -y perl \
+  && apt-get install -y perl ghostscript \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz \
