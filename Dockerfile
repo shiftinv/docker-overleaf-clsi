@@ -3,7 +3,7 @@ FROM node:10
 RUN apt-get update \
  && apt-get install -y checkinstall \
  && apt-get clean \
- && find /var/lib/apt/lists/ /tmp/ /var/tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+ && find /var/lib/apt/lists/ /tmp/ /var/tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
 
 # Build QPDF
 RUN cd /tmp \
@@ -15,7 +15,7 @@ RUN cd /tmp \
  && checkinstall -Dy --pkgname qpdf --pkgversion 6.0.0 \
  && mv qpdf_6.0.0-1_amd64.deb /qpdf.deb \
  && cd / \ 
- && find /tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+ && find /tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
 
 # Install clsi
 RUN git clone https://github.com/sharelatex/clsi-sharelatex /app \
@@ -43,11 +43,14 @@ COPY --chown=node:node --from=0 /app /app
 ADD --chown=node:node ./settings.clsi.coffee /app/config/settings.clsi.coffee
 ENV SHARELATEX_CONFIG /app/config/settings.clsi.coffee
 
+# Link synctex
+RUN ln -s /app/bin/synctex /opt/synctex
+
 # Install TeX Live
 RUN apt-get update \
  && apt-get install -y perl ghostscript \
  && apt-get clean \
- && find /var/lib/apt/lists/ /tmp/ /var/tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf {} + \
+ && find /var/lib/apt/lists/ /tmp/ /var/tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf "{}" + \
  \
  && wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz \
  && mkdir /install-tl-unx \
