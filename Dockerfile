@@ -17,18 +17,16 @@ RUN cd /tmp \
  && cd / \ 
  && find /tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf {} +
 
-RUN npm install -g grunt-cli
-
 # Install clsi
 RUN git clone https://github.com/sharelatex/clsi-sharelatex /app \
  && cd /app \
- && git checkout 12c1dc632a7afb090fb87db6d96d9be2e8bfb0cd \
+ && git checkout a62ff6e248d624c5ad78dbf08bb4613b043abdc2 \
  && npm install \
- && grunt install \
+ && npm run compile:all \
+ && rm -rf .git \
  && mkdir -p data/cache data/compiles \
  && touch data/db.sqlite \
- && chown -R node:node . \
- && rm -rf .git
+ && chown -R node:node .
 
 
 
@@ -49,7 +47,7 @@ ENV SHARELATEX_CONFIG /app/config/settings.clsi.coffee
 RUN apt-get update \
  && apt-get install -y perl ghostscript \
  && apt-get clean \
- && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+ && find /var/lib/apt/lists/ /tmp/ /var/tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf {} + \
  \
  && wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz \
  && mkdir /install-tl-unx \
