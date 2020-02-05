@@ -48,7 +48,7 @@ RUN ln -s /app/bin/synctex /opt/synctex
 
 # Install TeX Live
 RUN apt-get update \
- && apt-get install -y perl ghostscript \
+ && apt-get install -y perl ghostscript wget \
  && apt-get clean \
  && find /var/lib/apt/lists/ /tmp/ /var/tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf "{}" + \
  \
