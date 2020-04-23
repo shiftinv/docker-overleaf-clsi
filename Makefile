@@ -1,6 +1,6 @@
 # Makefile
 
 build:
-	docker build -f Dockerfile -t shiftinv/sharelatex-clsi:basic .
+	docker build -f Dockerfile -t shiftinv/overleaf-clsi:basic .
 
 .PHONY: build
