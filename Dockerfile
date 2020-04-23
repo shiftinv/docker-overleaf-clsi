@@ -14,16 +14,15 @@ RUN cd /tmp \
  && make \
  && checkinstall -Dy --pkgname qpdf --pkgversion 6.0.0 \
  && mv qpdf_6.0.0-1_amd64.deb /qpdf.deb \
- && cd / \ 
+ && cd / \
  && find /tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
 
 # Install clsi
-RUN git clone https://github.com/sharelatex/clsi-sharelatex /app \
+RUN git clone https://github.com/overleaf/clsi /app \
  && cd /app \
- && git checkout a62ff6e248d624c5ad78dbf08bb4613b043abdc2 \
- && npm install \
- && npm run compile:all \
+ && git checkout 812c4e661f1ebc406ef8150b9b954a431cac5983 \
  && rm -rf .git \
+ && npm install \
  && mkdir -p data/cache data/compiles \
  && touch data/db.sqlite \
  && chown -R node:node .
