@@ -23,10 +23,13 @@ RUN git clone https://github.com/overleaf/clsi /app \
  && git checkout 812c4e661f1ebc406ef8150b9b954a431cac5983 \
  && rm -rf .git \
  && npm install \
- && mkdir -p data/cache data/compiles \
- && touch data/db.sqlite \
- && chown -R node:node .
+ && npm run compile:all \
+ && chown -R node:node . \
+ && find /root/.cache /root/.npm /tmp /var/tmp -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
 
+# Create data directories
+RUN mkdir -p data/cache data/compiles \
+ && touch data/db.sqlite
 
 
 FROM node:10-slim
@@ -47,7 +50,7 @@ RUN ln -s /app/bin/synctex /opt/synctex
 
 # Install TeX Live
 RUN apt-get update \
- && apt-get install -y perl ghostscript wget \
+ && apt-get install -y perl ghostscript curl wget \
  && apt-get clean \
  && find /var/lib/apt/lists/ /tmp/ /var/tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
 
