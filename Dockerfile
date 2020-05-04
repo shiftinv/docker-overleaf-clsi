@@ -28,7 +28,8 @@ RUN git clone https://github.com/overleaf/clsi /app \
  && find /root/.cache /root/.npm /tmp /var/tmp -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
 
 # Create data directories
-RUN mkdir -p data/cache data/compiles \
+RUN cd /app \
+ && mkdir -p data/cache data/compiles \
  && touch data/db.sqlite
 
 
