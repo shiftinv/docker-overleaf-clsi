@@ -33,21 +33,8 @@ RUN cd /app \
  && touch data/db.sqlite
 
 
-FROM node:10-slim
 
-COPY --from=0 /qpdf.deb /qpdf.deb
-RUN dpkg -i /qpdf.deb \
- && rm /qpdf.deb
-
-# Copy clsi
-COPY --chown=node:node --from=0 /app /app
-
-# Add config
-ADD --chown=node:node ./settings.clsi.coffee /app/config/settings.clsi.coffee
-ENV SHARELATEX_CONFIG /app/config/settings.clsi.coffee
-
-# Link synctex
-RUN ln -s /app/bin/synctex /opt/synctex
+FROM node:10-buster-slim
 
 # Install TeX Live
 RUN apt-get update \
@@ -78,6 +65,21 @@ RUN mkdir /install-tl-unx \
 
 RUN tlmgr option repository ${TEXLIVE_MIRROR}
 RUN tlmgr install latexmk texcount
+
+# Install qpdf
+COPY --from=0 /qpdf.deb /qpdf.deb
+RUN dpkg -i /qpdf.deb \
+ && rm /qpdf.deb
+
+# Copy clsi
+COPY --chown=node:node --from=0 /app /app
+
+# Add config
+COPY --chown=node:node ./settings.clsi.coffee /app/config/settings.clsi.coffee
+ENV SHARELATEX_CONFIG /app/config/settings.clsi.coffee
+
+# Link synctex
+RUN ln -s /app/bin/synctex /opt/synctex
 
 WORKDIR /app
 USER node
