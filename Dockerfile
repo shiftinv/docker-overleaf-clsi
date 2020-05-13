@@ -18,9 +18,9 @@ RUN cd /tmp \
  && find /tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
 
 # Install clsi
-RUN git clone https://github.com/overleaf/clsi /app \
+RUN git clone https://github.com/shiftinv/overleaf-clsi /app \
  && cd /app \
- && git checkout 812c4e661f1ebc406ef8150b9b954a431cac5983 \
+ && git checkout dev \
  && rm -rf .git \
  && npm install \
  && npm run compile:all \
