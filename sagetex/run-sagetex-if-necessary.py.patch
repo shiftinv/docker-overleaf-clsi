@@ -1,0 +1,86 @@
+diff --git a/run-sagetex-if-necessary.py b/run-sagetex-if-necessary.py
+index 218479d..11100ee 100644
+--- a/run-sagetex-if-necessary.py
++++ b/run-sagetex-if-necessary.py
+@@ -36,37 +36,46 @@ import subprocess
+ from six import PY3
+ 
+ # CHANGE THIS AS APPROPRIATE
+-path_to_sage = os.path.expanduser('~/bin/sage')
++# path_to_sage = os.path.expanduser('~/bin/sage')
+ # or try to auto-find it:
+-# path_to_sage = subprocess.check_output(['which', 'sage']).strip()
++path_to_sage = subprocess.check_output(['which', 'sage']).strip()
+ # or just tell me:
+ # path_to_sage = '/usr/local/bin/sage'
+ 
+-if sys.argv[1].endswith('.sagetex.sage'):
+-    src = sys.argv[1][:-13]
+-else:
+-    src = os.path.splitext(sys.argv[1])[0]
++texfile = sys.argv[1]
++jobname = sys.argv[2]
++outdir = sys.argv[3]
+ 
+ usepackage = r'\usepackage(\[.*\])?{sagetex}'
+ uses_sagetex = False
+ 
+ # if it doesn't use sagetex, obviously running sage is unnecessary
+-with open(src + '.tex') as texf:
++with open(texfile) as texf:
+     for line in texf:
+         if re.search(usepackage, line.replace(r'\%', '').split('%')[0]):
+             uses_sagetex = True
+             break
+ 
+ if not uses_sagetex:
+-    print(src + ".tex doesn't seem to use SageTeX, exiting.")
++    print(texfile + " doesn't seem to use SageTeX, exiting.")
+     sys.exit(0)
+ 
++os.chdir(outdir)
++
++try:
++    if os.stat(jobname + '.sagetex.stderr.log').st_size != 0:
++        sys.stderr.write("Previous run failed, refusing to try again.\n")
++        sys.stderr.flush()
++        sys.exit(1)
++except IOError:
++    pass
++
+ # if something goes wrong, assume we need to run Sage
+ run_sage = True
+ ignore = r"^( _st_.goboom|print\('SageT| ?_st_.current_tex_line)"
+ 
+ try:
+-    with open(src + '.sagetex.sage', 'r') as sagef:
++    with open(jobname + '.sagetex.sage', 'r') as sagef:
+         h = hashlib.md5()
+         for line in sagef:
+             if not re.search(ignore, line):
+@@ -75,11 +84,12 @@ try:
+                 else:
+                     h.update(bytearray(line))
+ except IOError:
+-    print('{0}.sagetex.sage not found, I think you need to typeset {0}.tex first.'.format(src))
++    sys.stderr.write('{0}.sagetex.sage not found, I think you need to typeset {1} first.\n'.format(jobname, texfile))
++    sys.stderr.flush()
+     sys.exit(1)
+ 
+ try:
+-    with open(src + '.sagetex.sout', 'r') as outf:
++    with open(jobname + '.sagetex.sout', 'r') as outf:
+         for line in outf:
+             m = re.match('%([0-9a-f]+)% md5sum', line)
+             if m:
+@@ -92,7 +102,7 @@ except IOError:
+     pass
+ 
+ if run_sage:
+-    print('Need to run Sage on {0}.'.format(src))
+-    sys.exit(subprocess.call([path_to_sage, src + '.sagetex.sage']))
++    print('Need to run Sage on {0}.sagetex.sage.'.format(jobname))
++    sys.exit(subprocess.call([path_to_sage, jobname + '.sagetex.sage']))
+ else:
+-    print('Not necessary to run Sage on {0}.'.format(src))
++    print('Not necessary to run Sage on {0}.sagetex.sage.'.format(jobname))

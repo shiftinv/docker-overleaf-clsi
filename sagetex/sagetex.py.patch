@@ -1,0 +1,37 @@
+diff --git a/sagetex.py b/sagetex.py
+index b49492f..eec8fbf 100644
+--- a/sagetex.py
++++ b/sagetex.py
+@@ -95,12 +95,10 @@ http://doc.sagemath.org/html/en/tutorial/sagetex.html.""".format(jobname,
+     self.scmdtmp = open(self.filename + '.sagetex.scmd.tmp', 'w')
+     self.scmdtmp.write(autogenstr)
+     self.scmdpos = 3
+-  def progress(self, t,linebreak=True):
+-    if linebreak:
+-      print(t)
+-    else:
+-      sys.stdout.write(t)
+-      sys.stdout.flush()
++  def progress(self, t, linebreak=True, output=sys.stdout):
++    output.write(t)
++    if linebreak: output.write('\n')
++    output.flush()
+   def initplot(self):
+     self.progress('Initializing plots directory')
+     if os.path.isdir(self.plotdir):
+@@ -256,11 +254,11 @@ SAGE_ROOT/local/share/doc/sagetex.""")
+       '{0}/plot-{1}.{2}'.format(self.plotdir, counter, ext), \
+       '{0}/plot-{1}.eps'.format(self.plotdir, counter)])
+   def goboom(self, line):
+-    print('\n**** Error in Sage code on line {0} of {1}.tex! Traceback\
+- follows.'.format(line, self.filename))
++    self.progress('\n**** Error in Sage code on line {0} of {1}.tex! Traceback\
++ follows.'.format(line, self.filename), output=sys.stderr)
+     traceback.print_exc()
+-    print('\n**** Running Sage on {0}.sage failed! Fix {0}.tex and try\
+- again.'.format(self.filename))
++    self.progress('\n**** Running Sage on {0}.sage failed! Fix {0}.tex and try\
++ again.'.format(self.filename), output=sys.stderr)
+     self.souttmp.close()
+     os.remove(self.filename + '.sagetex.sout.tmp')
+     self.scmdtmp.close()
