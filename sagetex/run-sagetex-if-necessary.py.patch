@@ -1,8 +1,8 @@
 diff --git a/run-sagetex-if-necessary.py b/run-sagetex-if-necessary.py
-index 218479d..11100ee 100644
+index 218479d..5e16272 100644
 --- a/run-sagetex-if-necessary.py
 +++ b/run-sagetex-if-necessary.py
-@@ -36,37 +36,46 @@ import subprocess
+@@ -36,37 +36,38 @@ import subprocess
  from six import PY3
  
  # CHANGE THIS AS APPROPRIATE
@@ -40,14 +40,6 @@ index 218479d..11100ee 100644
  
 +os.chdir(outdir)
 +
-+try:
-+    if os.stat(jobname + '.sagetex.stderr.log').st_size != 0:
-+        sys.stderr.write("Previous run failed, refusing to try again.\n")
-+        sys.stderr.flush()
-+        sys.exit(1)
-+except IOError:
-+    pass
-+
  # if something goes wrong, assume we need to run Sage
  run_sage = True
  ignore = r"^( _st_.goboom|print\('SageT| ?_st_.current_tex_line)"
@@ -58,7 +50,7 @@ index 218479d..11100ee 100644
          h = hashlib.md5()
          for line in sagef:
              if not re.search(ignore, line):
-@@ -75,11 +84,12 @@ try:
+@@ -75,11 +76,12 @@ try:
                  else:
                      h.update(bytearray(line))
  except IOError:
@@ -73,7 +65,7 @@ index 218479d..11100ee 100644
          for line in outf:
              m = re.match('%([0-9a-f]+)% md5sum', line)
              if m:
-@@ -92,7 +102,7 @@ except IOError:
+@@ -92,7 +94,7 @@ except IOError:
      pass
  
  if run_sage:

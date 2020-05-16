@@ -33,11 +33,13 @@ RUN wget https://github.com/sagemath/sagetex/releases/download/v3.4/sagetex-3.4.
  && mv sagetex-3.4/sagetex.py /usr/lib/python2.7/dist-packages/ \
  && rm -rf sagetex-3.4 sagetex-3.4.tar.gz
 
+COPY ./run-sagetex-custom.py $SAGETEXSCRIPTS_PATH/run-sagetex-custom.py
+
 # autorun sagetex using latexmk
 #   %T = name of .tex file
 #   %R = jobname ('output')
 #   %Z = output directory
-ARG SAGETEX_COMMAND="{  [ ! -f %Z%R.sagetex.sage ] || python $SAGETEXSCRIPTS_PATH/run-sagetex-if-necessary.py %T %R %Z 1>>%Z%R.sagetex.stdout.log 2>>%Z%R.sagetex.stderr.log; }"
+ARG SAGETEX_COMMAND="{  [ ! -f %Z%R.sagetex.sage ] || python $SAGETEXSCRIPTS_PATH/run-sagetex-custom.py %T %R %Z 1>>%Z%R.sagetex.stdout.log 2>>%Z%R.sagetex.stderr.log; }"
 RUN echo "\$latex = \"\$latex && $SAGETEX_COMMAND\";\n\$pdflatex = \"\$pdflatex && $SAGETEX_COMMAND\";" >> /home/node/.latexmkrc
 
 
