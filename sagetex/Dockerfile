@@ -40,7 +40,7 @@ COPY ./run-sagetex-custom.py $SAGETEXSCRIPTS_PATH/run-sagetex-custom.py
 #   %R = jobname ('output')
 #   %Z = output directory
 ARG SAGETEX_COMMAND="{  [ ! -f %Z%R.sagetex.sage ] || python $SAGETEXSCRIPTS_PATH/run-sagetex-custom.py %T %R %Z 1>>%Z%R.sagetex.stdout.log 2>>%Z%R.sagetex.stderr.log; }"
-RUN echo "\$latex = \"\$latex && $SAGETEX_COMMAND\";\n\$pdflatex = \"\$pdflatex && $SAGETEX_COMMAND\";" >> /home/node/.latexmkrc
+RUN echo "\$latex = \"\$latex && $SAGETEX_COMMAND\";\n\$pdflatex = \"\$pdflatex && $SAGETEX_COMMAND\";" >> "$LATEXMKRCSYS"
 
 
 USER node

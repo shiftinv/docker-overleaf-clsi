@@ -66,6 +66,12 @@ RUN mkdir /install-tl-unx \
 RUN tlmgr option repository ${TEXLIVE_MIRROR}
 RUN tlmgr install latexmk texcount
 
+
+#
+ENV LATEXMKRCSYS=/opt/latexmkrc
+RUN echo "\$auto_rc_use = 0" > "${LATEXMKRCSYS}"
+
+
 # Install qpdf
 COPY --from=0 /qpdf.deb /qpdf.deb
 RUN dpkg -i /qpdf.deb \
