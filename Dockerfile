@@ -95,4 +95,4 @@ WORKDIR /app
 USER node
 EXPOSE 3013
 VOLUME /app/data
-ENTRYPOINT ["node", "app.js"]
+CMD ["node", "app.js"]
