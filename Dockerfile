@@ -42,35 +42,39 @@ RUN apt-get update \
  && apt-get clean \
  && find /var/lib/apt/lists/ /tmp/ /var/tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
 
-ARG TEXLIVE_MIRROR=http://mirror.ctan.org/systems/texlive/tlnet
+# prefix with underscores to avoid collisions with TeXLive
+ARG _TEXLIVE_MIRROR=http://mirror.ctan.org/systems/texlive/tlnet
 # scheme options: scheme-basic, scheme-small, scheme-medium, scheme-full
-ARG TEXLIVE_SCHEME=scheme-basic
-
-ENV PATH "${PATH}:/usr/local/texlive/2020/bin/x86_64-linux"
+ARG _TEXLIVE_SCHEME=scheme-basic
 
 RUN mkdir /install-tl-unx \
- && curl -sSL ${TEXLIVE_MIRROR}/install-tl-unx.tar.gz \
+ && curl -sSL ${_TEXLIVE_MIRROR}/install-tl-unx.tar.gz \
     | tar -xzC /install-tl-unx --strip-components=1 \
   \
  && echo "tlpdbopt_autobackup 0" >> /install-tl-unx/texlive.profile \
  && echo "tlpdbopt_install_docfiles 0" >> /install-tl-unx/texlive.profile \
  && echo "tlpdbopt_install_srcfiles 0" >> /install-tl-unx/texlive.profile \
- && echo "selected_scheme ${TEXLIVE_SCHEME}" >> /install-tl-unx/texlive.profile \
+ && echo "selected_scheme ${_TEXLIVE_SCHEME}" >> /install-tl-unx/texlive.profile \
   \
  && /install-tl-unx/install-tl \
       -profile /install-tl-unx/texlive.profile \
-      -repository ${TEXLIVE_MIRROR} \
+      -repository ${_TEXLIVE_MIRROR} \
   \
  && rm -rf /install-tl-unx
 
-RUN tlmgr option repository ${TEXLIVE_MIRROR}
+ENV _TEXLIVE_PATH "/usr/local/texlive/2020"
+ENV PATH "${PATH}:${_TEXLIVE_PATH}/bin/x86_64-linux"
+
+RUN tlmgr option repository ${_TEXLIVE_MIRROR}
 RUN tlmgr install latexmk texcount
 
 
-#
-ENV LATEXMKRCSYS=/opt/latexmkrc
+# don't read any other .latexmkrc files
+ENV LATEXMKRCSYS "/opt/latexmkrc"
 RUN echo "\$auto_rc_use = 0" > "${LATEXMKRCSYS}"
 
+# set openout/openin to paranoid
+RUN echo "openout_any = p\nopenin_any = p" >> "${_TEXLIVE_PATH}/texmf.cnf"
 
 # Install qpdf
 COPY --from=0 /qpdf.deb /qpdf.deb

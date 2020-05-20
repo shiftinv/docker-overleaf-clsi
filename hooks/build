@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker build -f $DOCKERFILE_PATH -t $IMAGE_NAME --build-arg TEXLIVE_SCHEME=scheme-$DOCKER_TAG .
+docker build -f $DOCKERFILE_PATH -t $IMAGE_NAME --build-arg _TEXLIVE_SCHEME=scheme-$DOCKER_TAG .
