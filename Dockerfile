@@ -84,7 +84,7 @@ RUN tlmgr install latexmk texcount
 
 # don't read any other .latexmkrc files
 ENV LATEXMKRCSYS "/opt/latexmkrc"
-RUN echo "\$auto_rc_use = 0" > "${LATEXMKRCSYS}"
+RUN echo "\$auto_rc_use = 0;" > "${LATEXMKRCSYS}"
 
 # set openout/openin to paranoid
 #RUN echo "openout_any = p\nopenin_any = p" >> "${_TEXLIVE_PATH}/texmf.cnf"
