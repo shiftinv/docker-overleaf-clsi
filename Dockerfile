@@ -33,6 +33,13 @@ RUN cd /app \
  && touch data/db.sqlite
 
 
+# Intermediate step for ensuring correct permissions on binaries
+FROM node:10-buster-slim AS texlive-bin-extract
+ADD ./texlive-bin-x86_64-linux.tar.gz /texlive-bin
+RUN chown -R 0:0 /texlive-bin \
+ && chmod -R 755 /texlive-bin
+
+
 
 FROM node:10-buster-slim
 
@@ -47,6 +54,9 @@ ARG _TEXLIVE_MIRROR=http://mirror.ctan.org/systems/texlive/tlnet
 # scheme options: scheme-basic, scheme-small, scheme-medium, scheme-full
 ARG _TEXLIVE_SCHEME=scheme-basic
 
+ENV _TEXLIVE_PATH "/usr/local/texlive/2020"
+ENV PATH "${PATH}:${_TEXLIVE_PATH}/bin/x86_64-linux"
+
 RUN mkdir /install-tl-unx \
  && curl -sSL ${_TEXLIVE_MIRROR}/install-tl-unx.tar.gz \
     | tar -xzC /install-tl-unx --strip-components=1 \
@@ -60,10 +70,13 @@ RUN mkdir /install-tl-unx \
       -profile /install-tl-unx/texlive.profile \
       -repository ${_TEXLIVE_MIRROR} \
   \
- && rm -rf /install-tl-unx
+ && rm -rf /install-tl-unx \
+ && rm -rf "${_TEXLIVE_PATH}/bin/x86_64-linux"
 
-ENV _TEXLIVE_PATH "/usr/local/texlive/2020"
-ENV PATH "${PATH}:${_TEXLIVE_PATH}/bin/x86_64-linux"
+# replace binaries
+COPY --from=texlive-bin-extract /texlive-bin/x86_64-linux "${_TEXLIVE_PATH}/bin/x86_64-linux"
+# make sure extraction worked
+RUN test -f "${_TEXLIVE_PATH}/bin/x86_64-linux/tex"
 
 RUN tlmgr option repository ${_TEXLIVE_MIRROR}
 RUN tlmgr install latexmk texcount
