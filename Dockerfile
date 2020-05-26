@@ -38,7 +38,7 @@ FROM node:10-buster-slim
 
 # Install TeX Live
 RUN apt-get update \
- && apt-get install -y perl ghostscript curl wget \
+ && apt-get install -y perl ghostscript curl wget gnupg \
  && apt-get clean \
  && find /var/lib/apt/lists/ /tmp/ /var/tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
 
