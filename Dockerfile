@@ -87,7 +87,7 @@ ENV LATEXMKRCSYS "/opt/latexmkrc"
 RUN echo "\$auto_rc_use = 0;" > "${LATEXMKRCSYS}"
 
 # set openout/openin to paranoid
-#RUN echo "openout_any = p\nopenin_any = p" >> "${_TEXLIVE_PATH}/texmf.cnf"
+RUN echo "openout_any = p\nopenin_any = p" >> "${_TEXLIVE_PATH}/texmf.cnf"
 
 # Install qpdf
 COPY --from=0 /qpdf.deb /qpdf.deb
