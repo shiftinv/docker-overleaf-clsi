@@ -72,6 +72,7 @@ RUN mkdir /install-tl-unx \
   \
  && rm -rf /install-tl-unx \
  && rm -rf "${_TEXLIVE_PATH}/bin/x86_64-linux"
+RUN test -d "${_TEXLIVE_PATH}"
 
 # replace binaries
 COPY --from=texlive-bin-extract /texlive-bin/x86_64-linux "${_TEXLIVE_PATH}/bin/x86_64-linux"
