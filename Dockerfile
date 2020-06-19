@@ -19,9 +19,8 @@ RUN git clone https://github.com/shiftinv/overleaf-clsi /app \
  && git checkout dev \
  && rm -rf .git \
  && npm install \
- && npm run compile:all \
  && chown -R node:node . \
- && find /root/.cache /root/.npm /root/.node-gyp /tmp /var/tmp -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
+ && find /root/.cache /root/.npm /tmp /var/tmp -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
 
 # Create data directories
 RUN cd /app \
