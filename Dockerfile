@@ -1,21 +1,17 @@
-FROM node:10
+# Intermediate step for ensuring correct permissions on binaries
+FROM node:10-buster-slim AS texlive-bin-extract
+ADD ./texlive-bin-x86_64-linux.tar.gz /texlive-bin
+RUN chown -R 0:0 /texlive-bin \
+ && chmod -R 755 /texlive-bin
+
+
+
+FROM node:10-buster
 
 RUN apt-get update \
- && apt-get install -y checkinstall \
+ && apt-get install -y qpdf perl ghostscript curl wget gnupg \
  && apt-get clean \
  && find /var/lib/apt/lists/ /tmp/ /var/tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
-
-# Build QPDF
-RUN cd /tmp \
- && wget https://s3.amazonaws.com/sharelatex-random-files/qpdf-6.0.0.tar.gz \
- && tar xzf qpdf-6.0.0.tar.gz \
- && cd qpdf-6.0.0 \
- && ./configure \
- && make \
- && checkinstall -Dy --pkgname qpdf --pkgversion 6.0.0 \
- && mv qpdf_6.0.0-1_amd64.deb /qpdf.deb \
- && cd / \
- && find /tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
 
 # Install clsi
 RUN git clone https://github.com/shiftinv/overleaf-clsi /app \
@@ -25,7 +21,7 @@ RUN git clone https://github.com/shiftinv/overleaf-clsi /app \
  && npm install \
  && npm run compile:all \
  && chown -R node:node . \
- && find /root/.cache /root/.npm /tmp /var/tmp -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
+ && find /root/.cache /root/.npm /root/.node-gyp /tmp /var/tmp -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
 
 # Create data directories
 RUN cd /app \
@@ -33,21 +29,7 @@ RUN cd /app \
  && touch data/db.sqlite
 
 
-# Intermediate step for ensuring correct permissions on binaries
-FROM node:10-buster-slim AS texlive-bin-extract
-ADD ./texlive-bin-x86_64-linux.tar.gz /texlive-bin
-RUN chown -R 0:0 /texlive-bin \
- && chmod -R 755 /texlive-bin
-
-
-
-FROM node:10-buster-slim
-
 # Install TeX Live
-RUN apt-get update \
- && apt-get install -y perl ghostscript curl wget gnupg \
- && apt-get clean \
- && find /var/lib/apt/lists/ /tmp/ /var/tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
 
 # prefix with underscores to avoid collisions with TeXLive
 ARG _TEXLIVE_MIRROR=http://mirror.ctan.org/systems/texlive/tlnet
@@ -72,6 +54,8 @@ RUN mkdir /install-tl-unx \
   \
  && rm -rf /install-tl-unx \
  && rm -rf "${_TEXLIVE_PATH}/bin/x86_64-linux"
+
+# make sure that year in _TEXLIVE_PATH is correct
 RUN test -d "${_TEXLIVE_PATH}"
 
 # replace binaries
@@ -89,14 +73,6 @@ RUN echo "\$auto_rc_use = 0;" > "${LATEXMKRCSYS}"
 
 # set openout/openin to paranoid
 RUN echo "openout_any = p\nopenin_any = p" >> "${_TEXLIVE_PATH}/texmf.cnf"
-
-# Install qpdf
-COPY --from=0 /qpdf.deb /qpdf.deb
-RUN dpkg -i /qpdf.deb \
- && rm /qpdf.deb
-
-# Copy clsi
-COPY --chown=node:node --from=0 /app /app
 
 # Add config
 COPY --chown=node:node ./settings.clsi.coffee /app/config/settings.clsi.coffee
