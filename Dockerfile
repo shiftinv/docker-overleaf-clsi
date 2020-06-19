@@ -25,7 +25,8 @@ RUN git clone https://github.com/shiftinv/overleaf-clsi /app \
 # Create data directories
 RUN cd /app \
  && mkdir -p data/cache data/compiles \
- && touch data/db.sqlite
+ && touch data/db.sqlite \
+ && chown -R node:node data
 
 
 # Install TeX Live
