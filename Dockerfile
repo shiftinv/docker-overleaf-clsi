@@ -13,6 +13,11 @@ RUN apt-get update \
  && apt-get clean \
  && find /var/lib/apt/lists/ /tmp/ /var/tmp/ -mindepth 1 -maxdepth 1 -exec rm -rf "{}" +
 
+# Install tini
+RUN curl -sSL https://github.com/krallin/tini/releases/download/v0.19.0/tini -o /tini \
+ && chmod +x /tini
+ENTRYPOINT ["/tini", "--"]
+
 # Install clsi
 RUN git clone https://github.com/shiftinv/overleaf-clsi /app \
  && cd /app \
