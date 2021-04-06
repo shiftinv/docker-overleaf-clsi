@@ -41,7 +41,7 @@ ARG _TEXLIVE_MIRROR=http://mirror.ctan.org/systems/texlive/tlnet
 # scheme options: scheme-basic, scheme-small, scheme-medium, scheme-full
 ARG _TEXLIVE_SCHEME=scheme-basic
 
-ENV _TEXLIVE_PATH "/usr/local/texlive/2020"
+ENV _TEXLIVE_PATH "/usr/local/texlive/2021"
 ENV PATH "${PATH}:${_TEXLIVE_PATH}/bin/x86_64-linux"
 
 RUN mkdir /install-tl-unx \
