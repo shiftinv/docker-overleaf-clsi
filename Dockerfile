@@ -44,6 +44,8 @@ ARG _TEXLIVE_SCHEME=scheme-basic
 ENV _TEXLIVE_PATH "/usr/local/texlive/2021"
 ENV PATH "${PATH}:${_TEXLIVE_PATH}/bin/x86_64-linux"
 
+ARG _TEXLIVE_CACHEBUSTER=
+
 RUN mkdir /install-tl-unx \
  && curl -sSL ${_TEXLIVE_MIRROR}/install-tl-unx.tar.gz \
     | tar -xzC /install-tl-unx --strip-components=1 \
