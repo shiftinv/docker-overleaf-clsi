@@ -1,12 +1,12 @@
 # Intermediate step for ensuring correct permissions on binaries
-FROM node:10-buster-slim AS texlive-bin-extract
+FROM node:12-buster AS texlive-bin-extract
 ADD ./texlive-bin-x86_64-linux.tar.gz /texlive-bin
 RUN chown -R 0:0 /texlive-bin \
  && chmod -R 755 /texlive-bin
 
 
 
-FROM node:10-buster
+FROM node:12-buster
 
 RUN apt-get update \
  && apt-get install -y qpdf perl ghostscript curl wget gnupg \
@@ -29,7 +29,7 @@ RUN git clone https://github.com/shiftinv/overleaf-clsi /app \
 
 # Create data directories
 RUN cd /app \
- && mkdir -p data/cache data/compiles \
+ && mkdir -p data/cache data/compiles data/output \
  && touch data/db.sqlite \
  && chown -R node:node data
 
